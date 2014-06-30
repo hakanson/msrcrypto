@@ -291,7 +291,13 @@ if (typeof operations !== "undefined") {
 
     msrcryptoHmac.importKey = function (p) {
 
-        var keyObject = msrcryptoJwk.jwkToKey(p.keyData, p.algorithm, ["k"]);
+        var keyObject = { alg: p.algorithm.hash.name };
+
+        if (p.format == "raw") {
+            keyObject.k = p.keyData;
+        } else {
+            keyObject = msrcryptoJwk.jwkToKey(p.keyData, p.algorithm, ["k"]);
+        }
 
         keyObject.alg = keyObject.alg.replace("HS", "sha-");
 

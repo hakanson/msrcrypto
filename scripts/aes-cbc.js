@@ -293,9 +293,15 @@ if (typeof operations !== "undefined") {
         };
     };
 
-    msrcryptoCbc.importKey = function (p) { 
+    msrcryptoCbc.importKey = function (p) {
 
-        var keyObject = msrcryptoJwk.jwkToKey(p.keyData, p.algorithm, ["k"]);
+        var keyObject = {};
+
+        if (p.format == "raw") {
+            keyObject.k = p.keyData;
+        } else {
+            keyObject = msrcryptoJwk.jwkToKey(p.keyData, p.algorithm, ["k"]);
+        }
 
         return {
             type: "keyImport",
