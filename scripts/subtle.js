@@ -645,7 +645,7 @@ var subtleParameters = [
    /* 4 */ { name: "format", type: "String", required: true },
    /* 5 */ { name: "keyData", type: "Array", required: true },
    /* 6 */ { name: "extractable", type: "Boolean", required: false },
-   /* 7 */ { name: "keyUsages", type: "Array", required: false },
+   /* 7 */ { name: "keyUsage", type: "Array", required: false },
    /* 8 */ { name: "derivedKeyType", type: "Object", required: true },
    /* 9 */ { name: "length", type: "Number", required: false }
 ];
@@ -778,7 +778,7 @@ var publicMethods = {
         return executeOperation("digest", arguments, 0);
     },
 
-    generateKey: function (/*@type(Algorithm)*/ algorithm, extractable, keyUsages) {
+    generateKey: function (/*@type(Algorithm)*/ algorithm, extractable, keyUsage) {
         return executeOperation("generateKey", arguments, 1);
     },
 
