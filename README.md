@@ -1,8 +1,10 @@
 msrcrypto
 =========
 
-Please review the MICROSOFT RESEARCH LICENSE TERMS before using.  This version has modified files under the terms of personal expirimentation.  Changes can be tracked via the Github issues or the change history.
+Please review the MICROSOFT RESEARCH LICENSE TERMS before using.  This version has modified files under the terms of personal experimentation.  Changes can be tracked via the Github [issues][1] or the [commit][2] history.
 
+[1]: https://github.com/hakanson/msrcrypto/issues
+[2]: https://github.com/hakanson/msrcrypto/commits/master
 =========
 **Microsoft Research JavaScript Cryptography Library**
 
