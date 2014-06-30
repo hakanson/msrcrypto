@@ -1,0 +1,1 @@
+rm msrcrypto.js; for f in `grep -o  scripts.*\.js msrcrypto.js.bundle`; do cat "${f}" | tail -c +4; echo; done >> msrcrypto.js
