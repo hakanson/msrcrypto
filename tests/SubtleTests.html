@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta charset="utf-8">
+
+    <title>Subtle Tests</title>
+
+    <link rel="stylesheet" href="../scripts/qunit/qunit-1.14.0.css">
+
+    <script type="text/javascript">
+
+        var setterSupport = (function () {
+            try {
+                Object.defineProperty({}, "oncomplete", {});
+                return true;
+            } catch (ex) {
+                return false;
+            }
+        }());
+
+        function load() {
+
+            checkWebWorker.checked = (window.Worker);
+            checkWebWorker.disabled = true;
+
+            checkTypedArray.checked = (window.Uint8Array);
+            checkTypedArray.disabled = true;
+
+            checkSetGet.checked = setterSupport;
+            checkSetGet.disabled = true;           
+
+            if (!checkWebWorker.checked) {
+                checkForceSync.disabled = true;
+            }
+
+            if (!window.msCrypto) {
+                checkMsCrypto.disabled = true;
+            }
+        }
+
+        function checkedMsCrypto() {
+
+            if (checkMsCrypto.checked) {
+                subtle = window.msCrypto.subtle;
+            } else {
+                subtle = msrCryptoFull;
+            }
+        }
+
+        function checkedMiniCrypto() {
+            var msrCryptoScr;
+
+            if (checkMiniCrypto.checked) {
+                msrCrypto = msrCryptoMin;
+                subtle = msrCrypto.subtle;
+
+            } else {
+                msrCrypto = msrCryptoFull;
+                subtle = msrCrypto.subtle;
+            }
+        }
+
+    </script>
+
+
+</head>
+
+<body onload="load()">
+
+
+    <table>
+        <tr>
+            <td>
+                <input id="button_start_top" type="button"
+                       style="width: 100px; margin: 0 0 5px 0; " value="Start" onclick="startTests();" />
+            </td>
+            <td>
+                <div id="testSettings" style="font-family: 'Lucida Sans Unicode', 'Lucida Sans', sans-serif; font-size:x-small">
+                    <label>Web Worker Support </label><input id="checkWebWorker" type="checkbox" />&nbsp;&nbsp;
+                    <label>Setter/Getter Support </label><input id="checkSetGet" type="checkbox" />&nbsp;&nbsp;
+                    <label>Typed Array Support </label><input id="checkTypedArray" type="checkbox" /><br />
+                    <label>Force Synchronous </label><input id="checkForceSync" type="checkbox" />&nbsp;&nbsp;
+                    <label>Use MsCrypto </label><input id="checkMsCrypto" type="checkbox" onclick="checkedMsCrypto();" />
+                    <label>Use minified msrCrypto </label><input id="checkMiniCrypto" type="checkbox" onclick="checkedMiniCrypto();" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- qunit test runner -->
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="../scripts/qunit/qunit-1.14.0.js"></script>
+
+    <!-- .Net Interop -->
+    <script src="../scripts/dotNet/dotNetInterop.js"></script>
+
+    <!-- msrCrypto -->
+    <script src="../msrcrypto.js"></script>
+
+    <script type="text/javascript">
+
+        var msrCryptoFull = msrCrypto;
+        msrCrypto = null;
+
+    </script>
+
+    <!-- msrCrypto min -->
+    <script src="../msrcrypto.min.js"></script>
+
+    <script type="text/javascript">
+        var msrCryptoMin = msrCrypto;
+        msrCrypto = msrCryptoFull;
+
+        var subtle = msrCrypto.subtle;
+
+    </script>
+
+    <!-- utilities file -->
+    <script src="../scripts/global.js"></script>
+    <script src="../scripts/utilities.js"></script>
+
+    <!-- test vectors -->
+    <script src="../scripts/testVectors/tv_aes_cbc.js"></script>
+    <script src="../scripts/testVectors/tv_aes_gcm.js"></script>
+    <script src="../scripts/testVectors/tv_hmac_sha256.js"></script>
+    <script src="../scripts/testVectors/tv_hmac_sha384.js"></script>
+    <script src="../scripts/testVectors/tv_hmac_sha512.js"></script>
+    <script src="../scripts/testVectors/tv_ecdsa.js"></script>
+    <script src="../scripts/testVectors/tv_sha224_short.js"></script>
+    <script src="../scripts/testVectors/tv_sha224_long.js"></script>
+    <script src="../scripts/testVectors/tv_sha256_short.js"></script>
+    <script src="../scripts/testVectors/tv_sha256_long.js"></script>
+    <script src="../scripts/testVectors/tv_sha384_short.js"></script>
+    <script src="../scripts/testVectors/tv_sha384_long.js"></script>
+    <script src="../scripts/testVectors/tv_sha512_short.js"></script>
+    <script src="../scripts/testVectors/tv_sha512_long.js"></script>
+
+    <!-- test scripts -->
+    <script src="../scripts/tests/SubtleTest.shared.js"></script>
+    <script src="../scripts/tests/SubtleTest.aes.gcm.js"></script>
+    <script src="../scripts/tests/SubtleTest.aes.cbc.js"></script>
+    <script src="../scripts/tests/SubtleTest.rsa.js"></script>
+    <script src="../scripts/tests/SubtleTest.sha256.js"></script>
+    <script src="../scripts/tests/SubtleTest.sha512.js"></script>
+    <script src="../scripts/tests/SubtleTest.hmac.js"></script>
+    <script src="../scripts/tests/SubtleTest.ecdsa.js"></script>
+    <script src="../scripts/tests/SubtleTest.ecdh.js"></script>
+    <script src="../scripts/tests/SubtleTest.kdf.js"></script>
+
+    <script type="text/javascript">
+        QUnit.config.autostart = false;
+
+        function startTests() {
+            button_start_top.value = "Stop";
+            button_start_top.onclick = function () { stopTests() };
+
+            button_start_bottom.value = "Stop";
+            button_start_bottom.onclick = function () { stopTests() };
+
+            QUnit.start();
+        }
+
+        function stopTests() {
+            button_start_top.value = "Start";
+            button_start_top.onclick = function () { startTests() };
+
+            button_start_bottom.value = "Start";
+            button_start_bottom.onclick = function () { startTests() };
+
+            QUnit.stop();
+        }
+
+    </script>
+
+    <input id="button_start_bottom" type="button"
+           style="width: 100px; margin: 5px 0 0 0; " value="Start" onclick="startTests();" />
+
+</body>
+
+</html>

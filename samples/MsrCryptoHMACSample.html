@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title></title>
+
+    <!-- crypto -->
+    <script type="text/javascript" src="../msrcrypto.js"></script>
+
+    <!-- Page scripts -->
+    <script type="text/javascript">
+
+        // This is an HMAC Sha-256 sample.
+        // - import HMAC key
+        // - sign some data
+        // - verify the signature
+
+
+        // Go ahead and change msrCrypto to msCrypto in the line below to
+        // verify this code against the IE11 Web Crypto API
+        var cryptoObject = window.msrCrypto;
+
+        var subtle = cryptoObject.subtle;
+
+        // Let's sign some plain text data
+        var plainText = "The quick brown fox jumps over the lazy dog";
+
+        for (var i = 0; i < 100; i++) {
+            plainText += " The quick brown fox jumps over the lazy dog";
+        }
+
+        // Convert the plain text to a byte array
+        var plainTextBytes = toSupportedArray(plainText);
+
+        // To compute the HMAC we need a key
+        // I generated this using IE11 API .GenerateKey() and then .ExportKey() to jwk
+        var hmckKeyString =
+                '{ \
+                    "kty" : "oct", \
+                    "alg" : "HS256", \
+                    "k" : "aGUjFzJj_OHygK4VBybLIiwGmM5rgZU8jedDcFXp3xQ", \
+                    "extractable" : true \
+                }';
+
+        // KeyImport takes a byte array of key text, so we'll convert it
+        var hmacKeyBytes = toSupportedArray(hmckKeyString);
+
+        // Import the hmac key for HMAC SHA-256 using jwk format
+        var keyOperation = subtle.importKey(
+            "jwk",
+            hmacKeyBytes,
+            { name: "hmac", hash: { name: "sha-256" } });
+
+        keyOperation.oncomplete = hmacKeyImportComplete;
+
+        keyOperation.onerror = handleError("Public key import error");
+
+        var hmacKeyHandle;
+
+        function hmacKeyImportComplete(e) {
+            hmacKeyHandle = e.target.result;
+
+            var cryptoOperation = subtle.sign(
+                { name: "hmac", hash: { name: "sha-256" } },
+                hmacKeyHandle,
+                plainTextBytes);
+
+            cryptoOperation.oncomplete = hmacSignComplete;
+
+            cryptoOperation.onerror = handleError("HMAC sign error");
+
+        }
+
+        function hmacSignComplete(e) {
+            var hmacSignatureBytes = toSupportedArray(e.target.result);
+
+            TextArea_PlainText.value = plainText;
+            TextArea_HMACHex.value = bytesToHexString(hmacSignatureBytes);
+
+            var cryptoOperation = subtle.verify(
+                { name: "hmac", hash: { name: "sha-256" } },
+                hmacKeyHandle,
+                hmacSignatureBytes,
+                plainTextBytes);
+
+            cryptoOperation.oncomplete = hmacVerifyComplete;
+
+            cryptoOperation.onerror = handleError("HMAC verify import error");
+
+        }
+
+        function hmacVerifyComplete(e) {
+            var hmacVerification = e.target.result;
+            TextArea_HMACVerify.value = hmacVerification;
+        }
+
+
+
+        // Converts Arrays, ArrayBuffers, TypedArrays, and Strings to
+        // to either a Uint8Array or a regular Array depending on browser support.
+        // You should use this when passing byte data in or out of crypto functions
+        function toSupportedArray(data) {
+
+            // does this browser support Typed Arrays?
+            var typedArraySupport = (typeof Uint8Array !== "undefined");
+
+            // get the data type of the parameter
+            var dataType = Object.prototype.toString.call(data);
+            dataType = dataType.substring(8, dataType.length - 1);
+
+            // determine the type
+            switch (dataType) {
+
+                // Regular JavaScript Array. Convert to Uint8Array if supported
+                // else do nothing and return the array
+                case "Array":
+                    return typedArraySupport ? new Uint8Array(data) : data;
+
+                    // ArrayBuffer. IE11 Web Crypto API returns ArrayBuffers that you have to convert
+                    // to Typed Arrays. Convert to a Uint8Arrays and return;
+                case "ArrayBuffer":
+                    return new Uint8Array(data);
+
+                    // Already Uint8Array. Obviously there is support.
+                case "Uint8Array":
+                    return data;
+
+                case "Uint16Array":
+                case "Uint32Array":
+                    return new Uint8Array(data);
+
+                    // String. Convert the string to a byte array using Typed Arrays if
+                    // supported.
+                case "String":
+                    var newArray = typedArraySupport ? new Uint8Array(data.length) : new Array(data.length);
+                    for (var i = 0; i < data.length; i += 1) {
+                        newArray[i] = data.charCodeAt(i);
+                    }
+                    return newArray;
+
+                    // Some other type. Just return the data unchanged.
+                default:
+                    throw new Error("toSupportedArray : unsupported data type " + dataType);
+            }
+
+        }
+
+        // General function to handle errors
+        function handleError(text) {
+            return function (e) {
+                alert(text + " : " + e.type);
+            };
+        }
+
+        // Converts an Array or TypedArray to a hex string
+        function bytesToHexString(bytes) {
+            var result = "";
+            for (var i = 0 ; i < bytes.length; i++) {
+                if (i % 4 === 0 && i !== 0) result += "-";
+                var hexval = bytes[i].toString(16).toUpperCase();
+                if (hexval.length == 1)
+                    result += "0";
+                result += hexval;
+            }
+            return result;
+        }
+
+
+    </script>
+
+</head>
+<body>
+    <label>Plain Text</label><br />
+    <textarea id="TextArea_PlainText" rows="20" cols="120"></textarea><br /><br />
+
+    <label>HMAC</label><br />
+    <textarea id="TextArea_HMACHex" rows="6" cols="120"></textarea><br /><br />
+
+    <label>HMAC Verify</label><br />
+    <textarea id="TextArea_HMACVerify" rows="2" cols="120"></textarea>
+
+</body>
+</html>

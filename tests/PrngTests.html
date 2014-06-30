@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta charset="utf-8">
+
+
+    <title>Crypto Tests</title>
+
+    <link rel="stylesheet" href="../scripts/qunit/qunit-1.14.0.css">
+
+    <!-- qunit test runner -->
+    <script src="../scripts/qunit/qunit-1.14.0.js"></script>
+
+    <!-- Dot Net interop -->
+    <script type="text/javascript" src="../scripts/dotnet/dotnetinterop.js"></script>
+
+</head>
+
+<body>
+
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+
+    <script src="../scripts/utilities.js"></script>
+    <script src="../scripts/aes.js"></script>
+    <script src="../scripts/random.js"></script>
+
+    <script src="../scripts/testVectors/tv_prng.js"></script>
+
+    <script src="../scripts/tests/PrngTests.js"></script>
+
+    <script type="text/javascript">
+
+        function getParam(key) {
+            // Find the key and everything up to the ampersand delimiter
+            var value = RegExp("" + key + "[^&]+").exec(window.location.search);
+
+            // Return the unescaped value minus everything starting from the equals sign or an empty string
+            return unescape(!!value ? value.toString().replace(/^[^=]+./, "") : "");
+        }
+
+        function testRunFinished(results) {
+
+            var testId = getParam("testid");
+
+            if (testId) {
+
+                dotNet.postResults(testId, JSON.stringify(results), JSON.stringify(testFailures));
+
+            }
+
+        }
+
+        var testFailures = [];
+
+        function testDone(result) {
+
+        }
+
+
+        function log(results) {
+
+            if (results.result == false) {
+                testFailures.push(results);
+            }
+        }
+
+        QUnit.testDone(testDone);
+        QUnit.done(testRunFinished);
+
+        QUnit.log(log);
+
+    </script>
+
+
+
+</body>
+
+</html>
+
