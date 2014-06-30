@@ -8939,7 +8939,7 @@ function keyOperation() {
                 keys.add(result.keyPair.privateKey.keyHandle, result.keyPair.privateKey.keyData);
                 return {
                     publicKey: result.keyPair.publicKey.keyHandle,
-                    privateKey: result.keyPair.privateKey.keyHandle,
+                    privateKey: result.keyPair.privateKey.keyHandle
                 };
 
             default:
